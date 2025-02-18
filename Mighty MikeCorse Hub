@@ -3544,9 +3544,7 @@ local function MO(name)
     
         for _, instance in pairs(machineinstances) do
             for _, v in pairs(instance:GetChildren()) do
-                -- Check for multiple possible machine types
                 if (v.Name == "Machine" or v.Name == "Treadmill" or v.Name == "SquatMachine") then
-                
                     local machinePart = v
                     if v:FindFirstChild("Machine") then
                         machinePart = v:FindFirstChild("Machine")
@@ -3555,15 +3553,24 @@ local function MO(name)
                     end
     
                     if machinePart:FindFirstChild("Base") and machinePart:FindFirstChild("ClickDetector") then
-                        local distance = (machinePart.Base.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                      
+                        local playerPos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+                        local machinePos = machinePart.Base.Position
+                      
+                        local horizontalDistance = Vector3.new(
+                            machinePos.X - playerPos.X,
+                            0, 
+                            machinePos.Z - playerPos.Z
+                        ).Magnitude
+    
                         local MaxActivationDist = machinePart.ClickDetector.MaxActivationDistance
     
-                        if distance <= MaxActivationDist then
+                        if horizontalDistance <= MaxActivationDist then
                             if bestdistance == nil and machine == nil then
-                                bestdistance = distance
+                                bestdistance = horizontalDistance
                                 machine = machinePart
-                            elseif bestdistance > distance then
-                                bestdistance = distance
+                            elseif bestdistance > horizontalDistance then
+                                bestdistance = horizontalDistance
                                 machine = machinePart
                             end
                         end
@@ -3574,6 +3581,7 @@ local function MO(name)
     
         return machine
     end
+    
     
 
 	local function GetSSBuy()
