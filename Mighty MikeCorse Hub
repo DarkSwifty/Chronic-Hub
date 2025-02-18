@@ -3533,35 +3533,48 @@ local function MO(name)
 		end
 	end
 
-	local function ClosestMachine()
-		local bestdistance, machine = nil, nil
-		local machineinstances =
-			{ workspace.Naniwa, workspace["Organisation Building"], workspace, workspace:GetChildren()[1436] }
-
-		for _, instance in pairs(machineinstances) do
-			for i, v in pairs(instance:GetChildren()) do
-				if GetMachineType(v) == machinetype and v.Name == "Machine" then
-					if v:FindFirstChild("Machine") then
-						v = v:FindFirstChild("Machine")
-					end
-					local distance = (v.Base.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-					local MaxActivationDist = v.ClickDetector.MaxActivationDistance
-
-					if distance <= MaxActivationDist then
-						if bestdistance == nil and machine == nil then
-							bestdistance = distance
-							machine = v
-						elseif bestdistance > distance then
-							bestdistance = distance
-							machine = v
-						end
-					end
-				end
-			end
-		end
-
-		return machine
-	end
+    local function ClosestMachine()
+        local bestdistance, machine = nil, nil
+        local machineinstances = { 
+            workspace.Naniwa, 
+            workspace["Organisation Building"], 
+            workspace, 
+            workspace:GetChildren()[1436] 
+        }
+    
+        for _, instance in pairs(machineinstances) do
+            for _, v in pairs(instance:GetChildren()) do
+                -- Check for multiple possible machine types
+                if (v.Name == "Machine" or v.Name == "Treadmill" or v.Name == "SquatMachine") then
+                
+                    local machinePart = v
+                    if v:FindFirstChild("Machine") then
+                        machinePart = v:FindFirstChild("Machine")
+                    elseif v:FindFirstChild("Base") then
+                        machinePart = v
+                    end
+    
+                    if machinePart:FindFirstChild("Base") and machinePart:FindFirstChild("ClickDetector") then
+                        local distance = (machinePart.Base.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                        local MaxActivationDist = machinePart.ClickDetector.MaxActivationDistance
+    
+                        if distance <= MaxActivationDist then
+                            if bestdistance == nil and machine == nil then
+                                bestdistance = distance
+                                machine = machinePart
+                            elseif bestdistance > distance then
+                                bestdistance = distance
+                                machine = machinePart
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    
+        return machine
+    end
+    
 
 	local function GetSSBuy()
 		local bestdistance, ss = nil, nil
